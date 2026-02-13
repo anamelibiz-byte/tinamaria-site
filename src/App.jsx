@@ -1471,16 +1471,23 @@ function ClientsView({ clients, setClients, onViewClient }) {
             ))}
           </div>
         </div>
-        <button style={{ display: "flex", alignItems: "center", gap: 6, padding: "10px 20px", borderRadius: 10, border: "none", background: theme.primary, color: "white", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
-          <Plus size={16} /> Add Client
-        </button>
+        <div style={{ display: "flex", gap: 8 }}>
+          {clients.length > 0 && (
+            <button onClick={() => { if (window.confirm(`Delete all ${clients.length} clients? This cannot be undone.`)) setClients([]); }} style={{ display: "flex", alignItems: "center", gap: 6, padding: "10px 20px", borderRadius: 10, border: `1px solid ${theme.danger}`, background: "transparent", color: theme.danger, fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
+              <Trash2 size={16} /> Clear All
+            </button>
+          )}
+          <button style={{ display: "flex", alignItems: "center", gap: 6, padding: "10px 20px", borderRadius: 10, border: "none", background: theme.primary, color: "white", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
+            <Plus size={16} /> Add Client
+          </button>
+        </div>
       </div>
 
       <div style={{ background: theme.card, borderRadius: 16, border: `1px solid ${theme.border}`, overflow: "hidden" }}>
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
           <thead>
             <tr style={{ borderBottom: `2px solid ${theme.border}` }}>
-              {["Client", "Type", "Contact", "Visits", "Total Spent", "Last Visit", "Tags", ""].map(h => (
+              {["Client", "Type", "Contact", "Visits", "Total Spent", "Last Visit", "Tags", "Actions"].map(h => (
                 <th key={h} style={{ padding: "14px 16px", textAlign: "left", fontSize: 12, fontWeight: 600, color: theme.textLight, textTransform: "uppercase", letterSpacing: "0.5px" }}>{h}</th>
               ))}
             </tr>
@@ -1513,11 +1520,27 @@ function ClientsView({ clients, setClients, onViewClient }) {
                     ))}
                   </div>
                 </td>
-                <td style={{ padding: "14px 16px" }}><ChevronRight size={16} color={theme.textLight} /></td>
+                <td style={{ padding: "14px 16px" }}>
+                  <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+                    <button onClick={(e) => { e.stopPropagation(); onViewClient(c.id); }} style={{ width: 30, height: 30, borderRadius: 8, border: `1px solid ${theme.border}`, background: "white", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: theme.textLight }} title="View">
+                      <Eye size={14} />
+                    </button>
+                    <button onClick={(e) => { e.stopPropagation(); if (window.confirm(`Delete ${c.name}?`)) setClients(prev => prev.filter(cl => cl.id !== c.id)); }} style={{ width: 30, height: 30, borderRadius: 8, border: `1px solid ${theme.dangerLight}`, background: "white", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: theme.danger }} title="Delete">
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
+        {filtered.length === 0 && (
+          <div style={{ padding: 48, textAlign: "center", color: theme.textLight }}>
+            <Users size={32} style={{ marginBottom: 12, opacity: 0.4 }} />
+            <p style={{ fontSize: 15, margin: "0 0 4px" }}>{clients.length === 0 ? "No clients yet" : "No clients match your search"}</p>
+            <p style={{ fontSize: 13, margin: 0 }}>{clients.length === 0 ? "New clients will appear here when they book through your site." : "Try adjusting your filters."}</p>
+          </div>
+        )}
       </div>
     </div>
   );
