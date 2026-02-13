@@ -443,6 +443,7 @@ export default function TinaMariaApp() {
   const [appointments] = useState(generateAppointments);
   const [clients, setClients] = useState(CLIENTS_DATA);
   const [transactions] = useState(TRANSACTIONS_DATA);
+  const [services, setServices] = useState(SERVICES);
   const [campaigns] = useState(CAMPAIGNS_DATA);
   const [showNewApptModal, setShowNewApptModal] = useState(false);
   const [showClientDetail, setShowClientDetail] = useState(null);
@@ -451,6 +452,7 @@ export default function TinaMariaApp() {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
+  const [quickMessage, setQuickMessage] = useState(null);
 
   // Handle browser back/forward navigation
   useEffect(() => {
@@ -614,15 +616,16 @@ export default function TinaMariaApp() {
           {activeTab === "dashboard" && <DashboardView appointments={appointments} transactions={transactions} clients={clients} selectedDate={selectedDate} onViewClient={setShowClientDetail} />}
           {activeTab === "calendar" && <CalendarView appointments={appointments} selectedDate={selectedDate} setSelectedDate={setSelectedDate} onNewAppt={() => setShowNewApptModal(true)} />}
           {activeTab === "clients" && <ClientsView clients={clients} setClients={setClients} onViewClient={setShowClientDetail} />}
-          {activeTab === "payments" && <PaymentsView transactions={transactions} />}
+          {activeTab === "payments" && <PaymentsView transactions={transactions} clients={clients} />}
           {activeTab === "marketing" && <MarketingView campaigns={campaigns} clients={clients} />}
-          {activeTab === "services" && <ServicesView />}
+          {activeTab === "services" && <ServicesView services={services} setServices={setServices} />}
           {activeTab === "settings" && <SettingsView />}
         </div>
       </main>
 
       {showNewApptModal && <NewAppointmentModal onClose={() => setShowNewApptModal(false)} clients={clients} />}
-      {showClientDetail !== null && <ClientDetailModal client={clients.find(c => c.id === showClientDetail)} onClose={() => setShowClientDetail(null)} appointments={appointments} transactions={transactions} />}
+      {showClientDetail !== null && <ClientDetailModal client={clients.find(c => c.id === showClientDetail)} onClose={() => setShowClientDetail(null)} appointments={appointments} transactions={transactions} onBookSession={(c) => { setShowClientDetail(null); setShowNewApptModal(true); }} onSendMessage={(c) => { setShowClientDetail(null); setQuickMessage({ to: c.email, name: c.name }); }} />}
+      {quickMessage && <QuickMessageModal to={quickMessage.to} name={quickMessage.name} onClose={() => setQuickMessage(null)} />}
     </div>
   );
 }
@@ -1448,6 +1451,8 @@ function CalendarView({ appointments, selectedDate, setSelectedDate, onNewAppt }
 function ClientsView({ clients, setClients, onViewClient }) {
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("all");
+  const [showAddClient, setShowAddClient] = useState(false);
+  const [newClient, setNewClient] = useState({ name: "", email: "", phone: "", type: "Life Coaching", tags: "" });
   const filtered = clients.filter(c => {
     const matchSearch = c.name.toLowerCase().includes(search.toLowerCase()) || c.email.toLowerCase().includes(search.toLowerCase());
     if (filter === "coaching") return matchSearch && c.type.includes("Coaching") || c.type === "Life Coaching";
@@ -1477,11 +1482,77 @@ function ClientsView({ clients, setClients, onViewClient }) {
               <Trash2 size={16} /> Clear All
             </button>
           )}
-          <button style={{ display: "flex", alignItems: "center", gap: 6, padding: "10px 20px", borderRadius: 10, border: "none", background: theme.primary, color: "white", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
+          <button onClick={() => setShowAddClient(true)} style={{ display: "flex", alignItems: "center", gap: 6, padding: "10px 20px", borderRadius: 10, border: "none", background: theme.primary, color: "white", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
             <Plus size={16} /> Add Client
           </button>
         </div>
       </div>
+
+      {/* Add Client Modal */}
+      {showAddClient && (
+        <div style={{ position: "fixed", inset: 0, zIndex: 200, display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.4)", backdropFilter: "blur(4px)" }} onClick={() => setShowAddClient(false)} />
+          <div style={{ position: "relative", width: 500, background: "white", borderRadius: 20, padding: 32, boxShadow: "0 16px 48px rgba(0,0,0,0.15)" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
+              <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700 }}>Add New Client</h3>
+              <button onClick={() => setShowAddClient(false)} style={{ background: "none", border: "none", cursor: "pointer", color: theme.textLight }}><X size={20} /></button>
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+              <div>
+                <label style={{ fontSize: 13, fontWeight: 600, color: theme.text, display: "block", marginBottom: 4 }}>Full Name *</label>
+                <input value={newClient.name} onChange={e => setNewClient({ ...newClient, name: e.target.value })} placeholder="e.g. Sarah Johnson" style={{ width: "100%", padding: "10px 14px", borderRadius: 10, border: `1px solid ${theme.border}`, fontSize: 14, outline: "none", boxSizing: "border-box" }} />
+              </div>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                <div>
+                  <label style={{ fontSize: 13, fontWeight: 600, color: theme.text, display: "block", marginBottom: 4 }}>Email *</label>
+                  <input value={newClient.email} onChange={e => setNewClient({ ...newClient, email: e.target.value })} placeholder="email@example.com" style={{ width: "100%", padding: "10px 14px", borderRadius: 10, border: `1px solid ${theme.border}`, fontSize: 14, outline: "none", boxSizing: "border-box" }} />
+                </div>
+                <div>
+                  <label style={{ fontSize: 13, fontWeight: 600, color: theme.text, display: "block", marginBottom: 4 }}>Phone</label>
+                  <input value={newClient.phone} onChange={e => setNewClient({ ...newClient, phone: e.target.value })} placeholder="(555) 123-4567" style={{ width: "100%", padding: "10px 14px", borderRadius: 10, border: `1px solid ${theme.border}`, fontSize: 14, outline: "none", boxSizing: "border-box" }} />
+                </div>
+              </div>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                <div>
+                  <label style={{ fontSize: 13, fontWeight: 600, color: theme.text, display: "block", marginBottom: 4 }}>Service Type</label>
+                  <select value={newClient.type} onChange={e => setNewClient({ ...newClient, type: e.target.value })} style={{ width: "100%", padding: "10px 14px", borderRadius: 10, border: `1px solid ${theme.border}`, fontSize: 14, outline: "none", boxSizing: "border-box", background: "white" }}>
+                    {["Life Coaching", "Hypnotherapy", "Business Coaching", "Digital Solutions", "Discovery"].map(t => <option key={t} value={t}>{t}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label style={{ fontSize: 13, fontWeight: 600, color: theme.text, display: "block", marginBottom: 4 }}>Tags (comma-separated)</label>
+                  <input value={newClient.tags} onChange={e => setNewClient({ ...newClient, tags: e.target.value })} placeholder="e.g. VIP, New" style={{ width: "100%", padding: "10px 14px", borderRadius: 10, border: `1px solid ${theme.border}`, fontSize: 14, outline: "none", boxSizing: "border-box" }} />
+                </div>
+              </div>
+              <button onClick={() => {
+                if (!newClient.name.trim() || !newClient.email.trim()) { alert("Name and email are required."); return; }
+                const initials = newClient.name.trim().split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2);
+                const client = {
+                  id: Date.now(),
+                  name: newClient.name.trim(),
+                  email: newClient.email.trim(),
+                  phone: newClient.phone.trim() || "—",
+                  avatar: initials,
+                  joined: new Date().toISOString().split("T")[0],
+                  visits: 0,
+                  totalSpent: 0,
+                  lastVisit: new Date().toISOString().split("T")[0],
+                  notes: "",
+                  upcomingAppt: null,
+                  favorite: false,
+                  tags: newClient.tags ? newClient.tags.split(",").map(t => t.trim()).filter(Boolean) : ["New"],
+                  type: newClient.type,
+                };
+                setClients(prev => [client, ...prev]);
+                setNewClient({ name: "", email: "", phone: "", type: "Life Coaching", tags: "" });
+                setShowAddClient(false);
+              }} style={{ padding: "12px", borderRadius: 10, border: "none", background: theme.primary, color: "white", fontSize: 15, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, marginTop: 4 }}>
+                <Plus size={16} /> Add Client
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div style={{ background: theme.card, borderRadius: 16, border: `1px solid ${theme.border}`, overflow: "hidden" }}>
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
@@ -1549,7 +1620,15 @@ function ClientsView({ clients, setClients, onViewClient }) {
 // ============================================================
 // PAYMENTS VIEW
 // ============================================================
-function PaymentsView({ transactions }) {
+function PaymentsView({ transactions, clients }) {
+  const [showInvoice, setShowInvoice] = useState(false);
+  const [showRefund, setShowRefund] = useState(false);
+  const [invoiceEmail, setInvoiceEmail] = useState("");
+  const [invoiceAmount, setInvoiceAmount] = useState("");
+  const [invoiceDesc, setInvoiceDesc] = useState("");
+  const [invoiceSending, setInvoiceSending] = useState(false);
+  const [invoiceResult, setInvoiceResult] = useState(null);
+  const [refundTxId, setRefundTxId] = useState("");
   const totalRevenue = transactions.reduce((s, t) => s + t.amount, 0);
   const totalTips = transactions.reduce((s, t) => s + t.tip, 0);
   const avgTransaction = transactions.filter(t => t.amount > 0).length > 0 ? Math.round(totalRevenue / transactions.filter(t => t.amount > 0).length) : 0;
@@ -1634,15 +1713,134 @@ function PaymentsView({ transactions }) {
           <div style={{ marginTop: 32 }}>
             <h4 style={{ margin: "0 0 16px", fontSize: 14, fontWeight: 600, color: theme.textLight }}>Quick Actions</h4>
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-              {["Send Invoice", "Issue Refund", "Export Report"].map(action => (
-                <button key={action} style={{ ...btnStyle, width: "100%", justifyContent: "space-between", display: "flex", alignItems: "center" }}>
-                  {action} <ChevronRight size={16} />
-                </button>
-              ))}
+              <button onClick={() => { setShowInvoice(true); setInvoiceResult(null); }} style={{ ...btnStyle, width: "100%", justifyContent: "space-between", display: "flex", alignItems: "center" }}>
+                Send Invoice <ChevronRight size={16} />
+              </button>
+              <button onClick={() => setShowRefund(true)} style={{ ...btnStyle, width: "100%", justifyContent: "space-between", display: "flex", alignItems: "center" }}>
+                Issue Refund <ChevronRight size={16} />
+              </button>
+              <button onClick={() => {
+                const header = "Date,Client,Service,Amount,Tip,Total,Method,Status";
+                const rows = transactions.map(t => `${t.date},"${t.client}","${t.service}",${t.amount},${t.tip},${t.total},${t.method},${t.status}`);
+                const csv = [header, ...rows].join("\n");
+                const blob = new Blob([csv], { type: "text/csv" });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = `tinamaria-payments-${new Date().toISOString().split("T")[0]}.csv`;
+                a.click();
+                URL.revokeObjectURL(url);
+              }} style={{ ...btnStyle, width: "100%", justifyContent: "space-between", display: "flex", alignItems: "center" }}>
+                Export Report <ChevronRight size={16} />
+              </button>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Send Invoice Modal */}
+      {showInvoice && (
+        <div style={{ position: "fixed", inset: 0, zIndex: 200, display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.4)", backdropFilter: "blur(4px)" }} onClick={() => setShowInvoice(false)} />
+          <div style={{ position: "relative", width: 480, background: "white", borderRadius: 20, padding: 32, boxShadow: "0 16px 48px rgba(0,0,0,0.15)" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
+              <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700 }}>Send Invoice</h3>
+              <button onClick={() => setShowInvoice(false)} style={{ background: "none", border: "none", cursor: "pointer", color: theme.textLight }}><X size={20} /></button>
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+              <div>
+                <label style={{ fontSize: 13, fontWeight: 600, display: "block", marginBottom: 4 }}>Client Email *</label>
+                <input value={invoiceEmail} onChange={e => setInvoiceEmail(e.target.value)} placeholder="client@email.com" style={{ width: "100%", padding: "10px 14px", borderRadius: 10, border: `1px solid ${theme.border}`, fontSize: 14, outline: "none", boxSizing: "border-box" }} />
+                {clients && clients.length > 0 && (
+                  <div style={{ display: "flex", gap: 4, flexWrap: "wrap", marginTop: 6 }}>
+                    {clients.slice(0, 4).map(c => (
+                      <button key={c.id} onClick={() => setInvoiceEmail(c.email)} style={{ padding: "2px 10px", borderRadius: 20, fontSize: 11, background: theme.bg, border: `1px solid ${theme.border}`, cursor: "pointer", color: theme.text }}>{c.name}</button>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                <div>
+                  <label style={{ fontSize: 13, fontWeight: 600, display: "block", marginBottom: 4 }}>Amount ($) *</label>
+                  <input type="number" value={invoiceAmount} onChange={e => setInvoiceAmount(e.target.value)} placeholder="150" style={{ width: "100%", padding: "10px 14px", borderRadius: 10, border: `1px solid ${theme.border}`, fontSize: 14, outline: "none", boxSizing: "border-box" }} />
+                </div>
+                <div>
+                  <label style={{ fontSize: 13, fontWeight: 600, display: "block", marginBottom: 4 }}>Description</label>
+                  <input value={invoiceDesc} onChange={e => setInvoiceDesc(e.target.value)} placeholder="Life Coaching Session" style={{ width: "100%", padding: "10px 14px", borderRadius: 10, border: `1px solid ${theme.border}`, fontSize: 14, outline: "none", boxSizing: "border-box" }} />
+                </div>
+              </div>
+              {invoiceResult === "sent" && <div style={{ padding: "10px 14px", borderRadius: 8, background: theme.successLight, color: theme.success, fontSize: 14, fontWeight: 600, display: "flex", alignItems: "center", gap: 8 }}><CheckCircle size={16} /> Invoice sent!</div>}
+              {invoiceResult === "error" && <div style={{ padding: "10px 14px", borderRadius: 8, background: theme.dangerLight, color: theme.danger, fontSize: 14, fontWeight: 600, display: "flex", alignItems: "center", gap: 8 }}><XCircle size={16} /> Failed to send.</div>}
+              <button onClick={async () => {
+                if (!invoiceEmail || !invoiceAmount) { alert("Email and amount required."); return; }
+                setInvoiceSending(true);
+                try {
+                  const html = `<div style="max-width:600px;margin:0 auto;padding:32px;font-family:sans-serif">
+                    <div style="text-align:center;margin-bottom:24px"><strong style="font-size:22px;color:#1D1D1D">Tina Maria</strong><br/><span style="color:#7A7A7A;font-size:14px">Invoice</span></div>
+                    <div style="background:#FAFAF8;border-radius:12px;padding:24px;margin-bottom:24px">
+                      <div style="font-size:14px;color:#7A7A7A;margin-bottom:8px">${invoiceDesc || "Services"}</div>
+                      <div style="font-size:32px;font-weight:700;color:#1D1D1D">$${Number(invoiceAmount).toLocaleString()}</div>
+                      <div style="font-size:13px;color:#7A7A7A;margin-top:8px">Due upon receipt</div>
+                    </div>
+                    <p style="font-size:14px;color:#333;line-height:1.6">Please send payment via Venmo, Zelle, or card at <a href="https://tinamaria.com/book" style="color:#7B9E89">tinamaria.com/book</a></p>
+                    <div style="margin-top:32px;padding-top:20px;border-top:1px solid #eee;text-align:center;font-size:12px;color:#999">Sent with love from TinaMaria.com</div>
+                  </div>`;
+                  const res = await fetch(`${API_BASE}/send-email`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ to: invoiceEmail, subject: `Invoice from Tina Maria — $${invoiceAmount}`, html }),
+                  });
+                  const data = await res.json();
+                  if (data.success || data.id) {
+                    setInvoiceResult("sent");
+                    setTimeout(() => { setShowInvoice(false); setInvoiceEmail(""); setInvoiceAmount(""); setInvoiceDesc(""); setInvoiceResult(null); }, 1500);
+                  } else { setInvoiceResult("error"); }
+                } catch { setInvoiceResult("error"); }
+                setInvoiceSending(false);
+              }} disabled={invoiceSending} style={{ padding: "12px", borderRadius: 10, border: "none", background: invoiceSending ? theme.textMuted : theme.primary, color: "white", fontSize: 15, fontWeight: 700, cursor: invoiceSending ? "not-allowed" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
+                {invoiceSending ? <><Loader2 size={16} style={{ animation: "spin 1s linear infinite" }} /> Sending...</> : <><Send size={16} /> Send Invoice</>}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Issue Refund Modal */}
+      {showRefund && (
+        <div style={{ position: "fixed", inset: 0, zIndex: 200, display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.4)", backdropFilter: "blur(4px)" }} onClick={() => setShowRefund(false)} />
+          <div style={{ position: "relative", width: 480, background: "white", borderRadius: 20, padding: 32, boxShadow: "0 16px 48px rgba(0,0,0,0.15)" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
+              <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700 }}>Issue Refund</h3>
+              <button onClick={() => setShowRefund(false)} style={{ background: "none", border: "none", cursor: "pointer", color: theme.textLight }}><X size={20} /></button>
+            </div>
+            <p style={{ fontSize: 14, color: theme.textLight, margin: "0 0 16px" }}>Select a transaction to refund:</p>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8, maxHeight: 300, overflowY: "auto" }}>
+              {transactions.filter(t => t.total > 0).map(t => (
+                <div key={t.id} onClick={() => setRefundTxId(t.id)} style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 16px", borderRadius: 12, border: `2px solid ${refundTxId === t.id ? theme.danger : theme.border}`, cursor: "pointer", background: refundTxId === t.id ? theme.dangerLight : "white", transition: "all 0.2s" }}>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: 14, fontWeight: 600 }}>{t.client}</div>
+                    <div style={{ fontSize: 12, color: theme.textLight }}>{t.service} · {formatDate(t.date)}</div>
+                  </div>
+                  <div style={{ fontSize: 15, fontWeight: 700 }}>{formatCurrency(t.total)}</div>
+                  {refundTxId === t.id && <Check size={18} color={theme.danger} />}
+                </div>
+              ))}
+            </div>
+            <button onClick={() => {
+              if (!refundTxId) { alert("Select a transaction first."); return; }
+              const tx = transactions.find(t => t.id === refundTxId);
+              if (window.confirm(`Issue refund of ${formatCurrency(tx.total)} to ${tx.client}? This would be processed through your Stripe dashboard.`)) {
+                alert(`Refund of ${formatCurrency(tx.total)} for ${tx.client} noted. To process the actual refund, go to your Stripe Dashboard > Payments > find the transaction > Issue Refund.`);
+                setShowRefund(false);
+                setRefundTxId("");
+              }
+            }} disabled={!refundTxId} style={{ marginTop: 16, padding: "12px", borderRadius: 10, border: "none", background: !refundTxId ? theme.textMuted : theme.danger, color: "white", fontSize: 15, fontWeight: 700, cursor: !refundTxId ? "not-allowed" : "pointer", width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, opacity: !refundTxId ? 0.5 : 1 }}>
+              <CreditCard size={16} /> Process Refund
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -1853,10 +2051,13 @@ function MarketingView({ campaigns, clients }) {
 // ============================================================
 // SERVICES VIEW
 // ============================================================
-function ServicesView() {
-  const categories = [...new Set(SERVICES.map(s => s.category))];
+function ServicesView({ services, setServices }) {
+  const categories = [...new Set(services.map(s => s.category))];
   const [activeCategory, setActiveCategory] = useState("all");
-  const filtered = activeCategory === "all" ? SERVICES : SERVICES.filter(s => s.category === activeCategory);
+  const [showAddService, setShowAddService] = useState(false);
+  const [newSvc, setNewSvc] = useState({ name: "", duration: "60", price: "", category: "Inner Mastery", emoji: "✨", desc: "" });
+  const filtered = activeCategory === "all" ? services : services.filter(s => s.category === activeCategory);
+  const colors = ["#7B9E89", "#8B7EC7", "#C4A882", "#5B8FA8", "#D4A843", "#1D1D1D"];
 
   return (
     <div>
@@ -1867,10 +2068,73 @@ function ServicesView() {
             <button key={cat} onClick={() => setActiveCategory(cat)} style={{ padding: "6px 14px", borderRadius: 8, border: "none", background: activeCategory === cat ? theme.card : "transparent", fontSize: 12, fontWeight: activeCategory === cat ? 600 : 400, cursor: "pointer", boxShadow: activeCategory === cat ? "0 1px 3px rgba(0,0,0,0.08)" : "none", color: theme.text }}>{cat}</button>
           ))}
         </div>
-        <button style={{ display: "flex", alignItems: "center", gap: 6, padding: "10px 20px", borderRadius: 10, border: "none", background: theme.primary, color: "white", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
+        <button onClick={() => setShowAddService(true)} style={{ display: "flex", alignItems: "center", gap: 6, padding: "10px 20px", borderRadius: 10, border: "none", background: theme.primary, color: "white", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
           <Plus size={16} /> Add Service
         </button>
       </div>
+
+      {/* Add Service Modal */}
+      {showAddService && (
+        <div style={{ position: "fixed", inset: 0, zIndex: 200, display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.4)", backdropFilter: "blur(4px)" }} onClick={() => setShowAddService(false)} />
+          <div style={{ position: "relative", width: 500, background: "white", borderRadius: 20, padding: 32, boxShadow: "0 16px 48px rgba(0,0,0,0.15)" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
+              <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700 }}>Add New Service</h3>
+              <button onClick={() => setShowAddService(false)} style={{ background: "none", border: "none", cursor: "pointer", color: theme.textLight }}><X size={20} /></button>
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+              <div style={{ display: "grid", gridTemplateColumns: "60px 1fr", gap: 12 }}>
+                <div>
+                  <label style={{ fontSize: 13, fontWeight: 600, display: "block", marginBottom: 4 }}>Emoji</label>
+                  <input value={newSvc.emoji} onChange={e => setNewSvc({ ...newSvc, emoji: e.target.value })} style={{ width: "100%", padding: "10px", borderRadius: 10, border: `1px solid ${theme.border}`, fontSize: 22, textAlign: "center", outline: "none", boxSizing: "border-box" }} />
+                </div>
+                <div>
+                  <label style={{ fontSize: 13, fontWeight: 600, display: "block", marginBottom: 4 }}>Service Name *</label>
+                  <input value={newSvc.name} onChange={e => setNewSvc({ ...newSvc, name: e.target.value })} placeholder="e.g. Group Coaching Session" style={{ width: "100%", padding: "10px 14px", borderRadius: 10, border: `1px solid ${theme.border}`, fontSize: 14, outline: "none", boxSizing: "border-box" }} />
+                </div>
+              </div>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12 }}>
+                <div>
+                  <label style={{ fontSize: 13, fontWeight: 600, display: "block", marginBottom: 4 }}>Duration (min)</label>
+                  <input type="number" value={newSvc.duration} onChange={e => setNewSvc({ ...newSvc, duration: e.target.value })} style={{ width: "100%", padding: "10px 14px", borderRadius: 10, border: `1px solid ${theme.border}`, fontSize: 14, outline: "none", boxSizing: "border-box" }} />
+                </div>
+                <div>
+                  <label style={{ fontSize: 13, fontWeight: 600, display: "block", marginBottom: 4 }}>Price ($)</label>
+                  <input type="number" value={newSvc.price} onChange={e => setNewSvc({ ...newSvc, price: e.target.value })} placeholder="0 = Free" style={{ width: "100%", padding: "10px 14px", borderRadius: 10, border: `1px solid ${theme.border}`, fontSize: 14, outline: "none", boxSizing: "border-box" }} />
+                </div>
+                <div>
+                  <label style={{ fontSize: 13, fontWeight: 600, display: "block", marginBottom: 4 }}>Category</label>
+                  <select value={newSvc.category} onChange={e => setNewSvc({ ...newSvc, category: e.target.value })} style={{ width: "100%", padding: "10px 14px", borderRadius: 10, border: `1px solid ${theme.border}`, fontSize: 14, outline: "none", boxSizing: "border-box", background: "white" }}>
+                    {["Inner Mastery", "Outer Growth", "Getting Started", "Premium"].map(c => <option key={c} value={c}>{c}</option>)}
+                  </select>
+                </div>
+              </div>
+              <div>
+                <label style={{ fontSize: 13, fontWeight: 600, display: "block", marginBottom: 4 }}>Description</label>
+                <textarea value={newSvc.desc} onChange={e => setNewSvc({ ...newSvc, desc: e.target.value })} placeholder="Brief description of this service..." rows={3} style={{ width: "100%", padding: "10px 14px", borderRadius: 10, border: `1px solid ${theme.border}`, fontSize: 14, outline: "none", resize: "vertical", fontFamily: "inherit", boxSizing: "border-box" }} />
+              </div>
+              <button onClick={() => {
+                if (!newSvc.name.trim()) { alert("Service name is required."); return; }
+                const service = {
+                  id: Date.now(),
+                  name: newSvc.name.trim(),
+                  duration: Number(newSvc.duration) || 60,
+                  price: Number(newSvc.price) || 0,
+                  category: newSvc.category,
+                  color: colors[Math.floor(Math.random() * colors.length)],
+                  emoji: newSvc.emoji || "✨",
+                  desc: newSvc.desc.trim() || "Custom service",
+                };
+                setServices(prev => [...prev, service]);
+                setNewSvc({ name: "", duration: "60", price: "", category: "Inner Mastery", emoji: "✨", desc: "" });
+                setShowAddService(false);
+              }} style={{ padding: "12px", borderRadius: 10, border: "none", background: theme.primary, color: "white", fontSize: 15, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, marginTop: 4 }}>
+                <Plus size={16} /> Add Service
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
         {filtered.map(s => (
@@ -1881,7 +2145,7 @@ function ServicesView() {
                 <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 4 }}>{s.name}</div>
                 <span style={{ fontSize: 12, color: theme.textLight, background: theme.bg, padding: "2px 10px", borderRadius: 20 }}>{s.category}</span>
               </div>
-              <button style={{ background: "none", border: "none", cursor: "pointer", color: theme.textLight }}><MoreVertical size={18} /></button>
+              <button onClick={() => { if (window.confirm(`Delete "${s.name}"?`)) setServices(prev => prev.filter(sv => sv.id !== s.id)); }} style={{ background: "none", border: "none", cursor: "pointer", color: theme.textLight }} title="Delete service"><Trash2 size={16} /></button>
             </div>
             <p style={{ fontSize: 13, color: theme.textLight, lineHeight: 1.5, margin: "12px 0 16px" }}>{s.desc}</p>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
@@ -2120,7 +2384,7 @@ function NewAppointmentModal({ onClose, clients }) {
   );
 }
 
-function ClientDetailModal({ client, onClose, appointments, transactions }) {
+function ClientDetailModal({ client, onClose, appointments, transactions, onBookSession, onSendMessage }) {
   if (!client) return null;
   const clientAppts = appointments.filter(a => a.clientId === client.id).slice(0, 8);
 
@@ -2199,13 +2463,71 @@ function ClientDetailModal({ client, onClose, appointments, transactions }) {
           </div>
 
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-            <button style={{ ...btnStyle, justifyContent: "center", display: "flex", gap: 6, alignItems: "center", padding: "12px", background: theme.accentLight, color: theme.accent, border: `1px solid ${theme.accent}30` }}>
+            <button onClick={() => { if (onBookSession) onBookSession(client); }} style={{ ...btnStyle, justifyContent: "center", display: "flex", gap: 6, alignItems: "center", padding: "12px", background: theme.accentLight, color: theme.accent, border: `1px solid ${theme.accent}30` }}>
               <Calendar size={16} /> Book Session
             </button>
-            <button style={{ ...btnStyle, justifyContent: "center", display: "flex", gap: 6, alignItems: "center", padding: "12px", background: theme.warmLight, color: theme.warm, border: `1px solid ${theme.warm}30` }}>
+            <button onClick={() => { if (onSendMessage) onSendMessage(client); }} style={{ ...btnStyle, justifyContent: "center", display: "flex", gap: 6, alignItems: "center", padding: "12px", background: theme.warmLight, color: theme.warm, border: `1px solid ${theme.warm}30` }}>
               <Send size={16} /> Send Message
             </button>
           </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+// QUICK MESSAGE MODAL
+// ============================================================
+function QuickMessageModal({ to, name, onClose }) {
+  const [subject, setSubject] = useState("");
+  const [body, setBody] = useState("");
+  const [sending, setSending] = useState(false);
+  const [result, setResult] = useState(null);
+
+  const handleSend = async () => {
+    if (!subject || !body) { alert("Please fill in subject and message."); return; }
+    setSending(true);
+    try {
+      const html = body.split("\n").map(p => `<p style="margin:0 0 12px;line-height:1.7;font-family:sans-serif;font-size:16px;color:#333">${p}</p>`).join("");
+      const fullHtml = `<div style="max-width:600px;margin:0 auto;padding:32px"><div style="text-align:center;margin-bottom:24px"><strong style="font-size:20px;color:#1D1D1D">Tina Maria</strong></div>${html}<div style="margin-top:32px;padding-top:20px;border-top:1px solid #eee;text-align:center;font-size:12px;color:#999">Sent with love from TinaMaria.com</div></div>`;
+      const res = await fetch(`${API_BASE}/send-email`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ to, subject, html: fullHtml }),
+      });
+      const data = await res.json();
+      if (data.success || data.id) {
+        setResult("sent");
+        setTimeout(() => onClose(), 1500);
+      } else { setResult("error"); }
+    } catch { setResult("error"); }
+    setSending(false);
+  };
+
+  return (
+    <div style={{ position: "fixed", inset: 0, zIndex: 300, display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.4)", backdropFilter: "blur(4px)" }} onClick={onClose} />
+      <div style={{ position: "relative", width: 520, background: "white", borderRadius: 20, padding: 32, boxShadow: "0 16px 48px rgba(0,0,0,0.15)" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+          <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700 }}>Message {name}</h3>
+          <button onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer", color: theme.textLight }}><X size={20} /></button>
+        </div>
+        <div style={{ fontSize: 13, color: theme.textLight, marginBottom: 16 }}>Sending to: {to}</div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+          <div>
+            <label style={{ fontSize: 13, fontWeight: 600, display: "block", marginBottom: 4 }}>Subject</label>
+            <input value={subject} onChange={e => setSubject(e.target.value)} placeholder="e.g. Your upcoming session" style={{ width: "100%", padding: "10px 14px", borderRadius: 8, border: `1px solid ${theme.border}`, fontSize: 14, outline: "none", boxSizing: "border-box" }} />
+          </div>
+          <div>
+            <label style={{ fontSize: 13, fontWeight: 600, display: "block", marginBottom: 4 }}>Message</label>
+            <textarea value={body} onChange={e => setBody(e.target.value)} placeholder="Write your message..." rows={6} style={{ width: "100%", padding: "10px 14px", borderRadius: 8, border: `1px solid ${theme.border}`, fontSize: 14, outline: "none", resize: "vertical", fontFamily: "inherit", boxSizing: "border-box" }} />
+          </div>
+          {result === "sent" && <div style={{ padding: "10px 14px", borderRadius: 8, background: theme.successLight, color: theme.success, fontSize: 14, fontWeight: 600, display: "flex", alignItems: "center", gap: 8 }}><CheckCircle size={16} /> Message sent!</div>}
+          {result === "error" && <div style={{ padding: "10px 14px", borderRadius: 8, background: theme.dangerLight, color: theme.danger, fontSize: 14, fontWeight: 600, display: "flex", alignItems: "center", gap: 8 }}><XCircle size={16} /> Failed to send. Check your Resend API key.</div>}
+          <button onClick={handleSend} disabled={sending} style={{ padding: "12px", borderRadius: 10, border: "none", background: sending ? theme.textMuted : theme.accent, color: "white", fontSize: 15, fontWeight: 700, cursor: sending ? "not-allowed" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
+            {sending ? <><Loader2 size={16} style={{ animation: "spin 1s linear infinite" }} /> Sending...</> : <><Send size={16} /> Send Message</>}
+          </button>
         </div>
       </div>
     </div>
