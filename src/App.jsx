@@ -277,7 +277,7 @@ function BookingView() {
   return (
     <div style={{ fontFamily: "'Inter', sans-serif", minHeight: "100vh", background: theme.bg }}>
       {/* Booking Nav */}
-      <nav style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "16px 40px", background: "white", borderBottom: `1px solid ${theme.border}` }}>
+      <nav className="tm-booking-nav" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "16px 40px", background: "white", borderBottom: `1px solid ${theme.border}` }}>
         <a href="/" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
           <div style={{ width: 36, height: 36, borderRadius: 50, background: `linear-gradient(135deg, ${theme.accent}, ${theme.warm})`, display: "flex", alignItems: "center", justifyContent: "center" }}>
             <Sparkles size={16} color="white" />
@@ -289,9 +289,9 @@ function BookingView() {
         </div>
       </nav>
 
-      <div style={{ maxWidth: 900, margin: "0 auto", padding: "48px 24px" }}>
+      <div className="tm-booking-content" style={{ maxWidth: 900, margin: "0 auto", padding: "48px 24px" }}>
         <div style={{ textAlign: "center", marginBottom: 48 }}>
-          <h1 style={{ fontSize: 36, fontWeight: 700, color: theme.primary, margin: "0 0 12px", letterSpacing: "-0.5px" }}>Book a Session with Tina Maria</h1>
+          <h1 className="tm-booking-title" style={{ fontSize: 36, fontWeight: 700, color: theme.primary, margin: "0 0 12px", letterSpacing: "-0.5px" }}>Book a Session with Tina Maria</h1>
           <p style={{ fontSize: 17, color: theme.textLight, margin: 0, lineHeight: 1.6 }}>Choose your service, enter your info, and you're all set. Simple as that.</p>
         </div>
 
@@ -301,7 +301,7 @@ function BookingView() {
             <span style={{ width: 28, height: 28, borderRadius: "50%", background: theme.accent, color: "white", display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 700 }}>1</span>
             Choose Your Session
           </h2>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 16 }}>
+          <div className="tm-booking-grid" style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 16 }}>
             {bookableServices.map(svc => {
               const isSelected = selectedService?.id === svc.id;
               const isHovered = hoveredId === svc.id;
@@ -335,7 +335,7 @@ function BookingView() {
               Your Information
             </h2>
             <div style={{ background: "white", borderRadius: 14, border: `1px solid ${theme.border}`, padding: 28 }}>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 }}>
+              <div className="tm-form-row" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 }}>
                 <div>
                   <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: theme.text, marginBottom: 6 }}>Your Name</label>
                   <input value={customerName} onChange={e => setCustomerName(e.target.value)} placeholder="Jane Smith" style={{ width: "100%", padding: "12px 14px", borderRadius: 10, border: `1px solid ${theme.border}`, fontSize: 15, outline: "none", boxSizing: "border-box" }} />
@@ -493,10 +493,10 @@ export default function TinaMariaApp() {
   ];
 
   return (
-    <div style={{ display: "flex", height: "100vh", fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif", background: theme.bg, color: theme.text, overflow: "hidden" }}>
+    <div className="tm-admin-layout" style={{ display: "flex", height: "100vh", fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif", background: theme.bg, color: theme.text, overflow: "hidden" }}>
       {/* SIDEBAR */}
-      <aside style={{ width: sidebarCollapsed ? 72 : 240, background: theme.sidebar, display: "flex", flexDirection: "column", transition: "width 0.3s ease", flexShrink: 0, overflow: "hidden" }}>
-        <div style={{ padding: sidebarCollapsed ? "24px 12px" : "24px 20px", borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
+      <aside className="tm-sidebar" style={{ width: sidebarCollapsed ? 72 : 240, background: theme.sidebar, display: "flex", flexDirection: "column", transition: "width 0.3s ease", flexShrink: 0, overflow: "hidden" }}>
+        <div className="tm-sidebar-logo" style={{ padding: sidebarCollapsed ? "24px 12px" : "24px 20px", borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }} onClick={() => setSidebarCollapsed(!sidebarCollapsed)}>
             <div style={{ width: 36, height: 36, borderRadius: 10, background: `linear-gradient(135deg, ${theme.accent}, ${theme.accentMid})`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
               <Sparkles size={18} color="white" />
@@ -522,7 +522,7 @@ export default function TinaMariaApp() {
           </button>
         </nav>
         {!sidebarCollapsed && (
-          <div style={{ padding: "16px 20px", borderTop: "1px solid rgba(255,255,255,0.08)" }}>
+          <div className="tm-sidebar-profile" style={{ padding: "16px 20px", borderTop: "1px solid rgba(255,255,255,0.08)" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
               <div style={{ width: 34, height: 34, borderRadius: "50%", background: `linear-gradient(135deg, ${theme.accent}, ${theme.warm})`, display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontSize: 13, fontWeight: 600 }}>TM</div>
               <div>
@@ -535,8 +535,8 @@ export default function TinaMariaApp() {
       </aside>
 
       {/* MAIN CONTENT */}
-      <main style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
-        <header style={{ height: 64, background: theme.card, borderBottom: `1px solid ${theme.border}`, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 28px", flexShrink: 0 }}>
+      <main className="tm-admin-main" style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
+        <header className="tm-admin-header" style={{ height: 64, background: theme.card, borderBottom: `1px solid ${theme.border}`, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 28px", flexShrink: 0 }}>
           <h1 style={{ fontSize: 20, fontWeight: 700, margin: 0 }}>{activeTab === "dashboard" ? "Welcome back, Tina ✨" : navItems.find(n => n.id === activeTab)?.label}</h1>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             <div style={{ position: "relative" }}>
@@ -572,7 +572,7 @@ export default function TinaMariaApp() {
           </div>
         </header>
 
-        <div style={{ flex: 1, overflow: "auto", padding: 28 }} onClick={() => { setSearchOpen(false); setNotifOpen(false); }}>
+        <div className="tm-admin-body" style={{ flex: 1, overflow: "auto", padding: 28 }} onClick={() => { setSearchOpen(false); setNotifOpen(false); }}>
           {activeTab === "dashboard" && <DashboardView appointments={appointments} transactions={transactions} clients={clients} selectedDate={selectedDate} onViewClient={setShowClientDetail} />}
           {activeTab === "calendar" && <CalendarView appointments={appointments} selectedDate={selectedDate} setSelectedDate={setSelectedDate} onNewAppt={() => setShowNewApptModal(true)} />}
           {activeTab === "clients" && <ClientsView clients={clients} setClients={setClients} onViewClient={setShowClientDetail} />}
@@ -669,7 +669,7 @@ function WebsiteView({ onOpenAdmin }) {
 
   // ---- NAV ----
   const NavBar = () => (
-    <nav style={{ position: "sticky", top: 0, zIndex: 1000, background: "rgba(255,255,255,0.97)", backdropFilter: "blur(12px)", borderBottom: `1px solid ${theme.border}`, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 40px" }}>
+    <nav className="tm-nav" style={{ position: "sticky", top: 0, zIndex: 1000, background: "rgba(255,255,255,0.97)", backdropFilter: "blur(12px)", borderBottom: `1px solid ${theme.border}`, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 40px" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 32 }}>
         <a href="#home" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none", cursor: "pointer" }}>
           <div style={{ width: 38, height: 38, borderRadius: 50, background: `linear-gradient(135deg, ${theme.accent}, ${theme.warm})`, display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -677,16 +677,29 @@ function WebsiteView({ onOpenAdmin }) {
           </div>
           <span style={{ fontSize: 20, fontWeight: 700, color: theme.primary, letterSpacing: "-0.5px" }}>TinaMaria</span>
         </a>
-        <div style={{ display: "flex", gap: 24 }}>
+        <div className="tm-nav-links" style={{ display: "flex", gap: 24 }}>
           {["About", "Services", "Course", "Work", "Blog", "Creative", "Contact"].map(item => (
             <a key={item} href={`#${item.toLowerCase()}`} style={{ fontSize: 14, color: theme.textLight, textDecoration: "none", fontWeight: 500, cursor: "pointer", transition: "color 0.2s" }} onMouseEnter={e => e.target.style.color = theme.primary} onMouseLeave={e => e.target.style.color = theme.textLight}>{item}</a>
           ))}
         </div>
       </div>
-      <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-        <button onClick={onOpenAdmin} style={{ padding: "7px 14px", borderRadius: 8, border: `1px solid ${theme.border}`, background: "transparent", color: theme.textLight, fontSize: 12, fontWeight: 500, cursor: "pointer" }}>Admin</button>
-        <a href="/book" style={{ padding: "10px 24px", borderRadius: 50, border: "none", background: theme.primary, color: "white", fontSize: 14, fontWeight: 600, cursor: "pointer", transition: "all 0.2s", textDecoration: "none" }} onMouseEnter={e => { e.target.style.background = "#333"; e.target.style.transform = "translateY(-1px)"; }} onMouseLeave={e => { e.target.style.background = theme.primary; e.target.style.transform = "translateY(0)"; }}>Book Now</a>
+      <div className="tm-nav-actions" style={{ display: "flex", gap: 10, alignItems: "center" }}>
+        <button className="tm-mobile-toggle" onClick={() => setMobileMenu(!mobileMenu)} style={{ width: 38, height: 38, borderRadius: 8, border: `1px solid ${theme.border}`, background: "white", cursor: "pointer", display: "none", alignItems: "center", justifyContent: "center" }}>
+          <Menu size={20} color={theme.text} />
+        </button>
+        <button className="tm-admin-btn" onClick={onOpenAdmin} style={{ padding: "7px 14px", borderRadius: 8, border: `1px solid ${theme.border}`, background: "transparent", color: theme.textLight, fontSize: 12, fontWeight: 500, cursor: "pointer" }}>Admin</button>
+        <a className="tm-book-btn" href="/book" style={{ padding: "10px 24px", borderRadius: 50, border: "none", background: theme.primary, color: "white", fontSize: 14, fontWeight: 600, cursor: "pointer", transition: "all 0.2s", textDecoration: "none" }} onMouseEnter={e => { e.target.style.background = "#333"; e.target.style.transform = "translateY(-1px)"; }} onMouseLeave={e => { e.target.style.background = theme.primary; e.target.style.transform = "translateY(0)"; }}>Book Now</a>
       </div>
+      {mobileMenu && (
+        <div className="tm-mobile-menu" style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(255,255,255,0.98)", zIndex: 2000, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 24 }}>
+          <button className="tm-mobile-menu-close" onClick={() => setMobileMenu(false)} style={{ position: "absolute", top: 16, right: 16, background: "none", border: "none", cursor: "pointer" }}><X size={28} color={theme.text} /></button>
+          {["About", "Services", "Course", "Work", "Blog", "Creative", "Contact"].map(item => (
+            <a key={item} href={`#${item.toLowerCase()}`} onClick={() => setMobileMenu(false)} style={{ fontSize: 20, fontWeight: 600, color: theme.primary, textDecoration: "none" }}>{item}</a>
+          ))}
+          <a href="/book" onClick={() => setMobileMenu(false)} style={{ padding: "14px 36px", borderRadius: 50, background: theme.primary, color: "white", fontSize: 16, fontWeight: 600, textDecoration: "none", marginTop: 12 }}>Book Now</a>
+          <button onClick={() => { onOpenAdmin(); setMobileMenu(false); }} style={{ padding: "10px 24px", borderRadius: 8, border: `1px solid ${theme.border}`, background: "transparent", color: theme.textLight, fontSize: 14, cursor: "pointer" }}>Admin</button>
+        </div>
+      )}
     </nav>
   );
 
@@ -695,15 +708,15 @@ function WebsiteView({ onOpenAdmin }) {
   const hibiscusPetal = "M0,-8 C-18,-42 -48,-58 -42,-38 C-38,-22 -22,-10 0,-8Z";
   const leafSvg = `url("data:image/svg+xml,${encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' width='800' height='800' viewBox='0 0 800 800'><defs><g id='hb'><path d='M0,-10 C-8,-30 -30,-52 -40,-42 C-50,-32 -38,-12 -10,-4 C-4,-2 -2,-6 0,-10Z' fill='#7B9E89'/><path d='M0,-10 C8,-30 30,-52 40,-42 C50,-32 38,-12 10,-4 C4,-2 2,-6 0,-10Z' fill='#7B9E89'/><path d='M-10,0 C-30,8 -52,30 -42,40 C-32,50 -12,38 -4,10 C-2,4 -6,2 -10,0Z' fill='#7B9E89'/><path d='M10,0 C30,8 52,30 42,40 C32,50 12,38 4,10 C2,4 6,2 10,0Z' fill='#7B9E89'/><path d='M0,10 C-8,30 -18,52 -6,50 C6,48 8,28 2,12 C1,8 0,9 0,10Z' fill='#7B9E89'/><circle cx='0' cy='0' r='5' fill='#C4A882'/><line x1='0' y1='-2' x2='0' y2='-58' stroke='#C4A882' stroke-width='1.2'/><circle cx='0' cy='-58' r='2.5' fill='#C4A882'/><circle cx='-3' cy='-52' r='1.8' fill='#C4A882'/><circle cx='3' cy='-52' r='1.8' fill='#C4A882'/></g></defs><g opacity='0.14'><use href='#hb' transform='translate(100,120) rotate(-15) scale(1.1)'/><use href='#hb' transform='translate(680,80) rotate(25) scale(0.8)'/><use href='#hb' transform='translate(380,340) rotate(40) scale(1.2)'/><use href='#hb' transform='translate(60,550) rotate(-30) scale(0.9)'/><use href='#hb' transform='translate(720,480) rotate(55) scale(0.75)'/><use href='#hb' transform='translate(300,700) rotate(-5) scale(1.0)'/><use href='#hb' transform='translate(550,650) rotate(70) scale(0.65)'/></g></svg>`)}")`;
   const HeroSection = () => (
-    <section id="home" style={{ background: `linear-gradient(180deg, ${theme.accentLight} 0%, white 100%)`, padding: "100px 40px 80px", position: "relative", overflow: "hidden" }}>
+    <section id="home" className="tm-hero tm-section" style={{ background: `linear-gradient(180deg, ${theme.accentLight} 0%, white 100%)`, padding: "100px 40px 80px", position: "relative", overflow: "hidden" }}>
       {/* Subtle hibiscus texture */}
       <div style={{ position: "absolute", inset: 0, backgroundImage: leafSvg, backgroundSize: "800px 800px", backgroundRepeat: "repeat", pointerEvents: "none" }} />
       <div style={{ maxWidth: 860, margin: "0 auto", textAlign: "center", position: "relative", zIndex: 1 }}>
-        <div style={{ display: "inline-block", background: "white", border: `1px solid ${theme.border}`, borderRadius: 50, padding: "8px 20px", fontSize: 14, color: theme.accent, fontWeight: 600, marginBottom: 28 }}>Life Coach · Hypnotherapist · Digital Marketing · Zoey Zest</div>
-        <h1 style={{ fontSize: 52, fontWeight: 700, color: theme.primary, lineHeight: 1.15, margin: "0 0 24px", letterSpacing: "-1.5px" }}>Life is supposed to be <span style={{ fontFamily: "'Caveat', cursive", fontSize: 68, color: theme.accent, fontWeight: 700, display: "inline-block", transform: "rotate(-2deg)", position: "relative" }}>fun<span style={{ position: "absolute", bottom: -4, left: 0, right: 0, height: 6, background: `${theme.accent}25`, borderRadius: 3 }} /></span>.<br/>Building your business should be too.</h1>
-        <p style={{ fontSize: 19, color: theme.textLight, lineHeight: 1.7, margin: "0 auto 20px", maxWidth: 640 }}>Hey, I'm Tina Maria. I help women in their 40s, 50s, and 60s start the online businesses they've been dreaming about — with the mindset, strategy, and tech support to actually make it happen.</p>
-        <p style={{ fontSize: 17, color: theme.text, lineHeight: 1.7, margin: "0 auto 36px", maxWidth: 580, fontWeight: 500 }}>No overwhelm. No jargon. Just real guidance from someone who gets it.</p>
-        <div style={{ display: "flex", gap: 14, justifyContent: "center", flexWrap: "wrap" }}>
+        <div className="tm-hero-pill" style={{ display: "inline-block", background: "white", border: `1px solid ${theme.border}`, borderRadius: 50, padding: "8px 20px", fontSize: 14, color: theme.accent, fontWeight: 600, marginBottom: 28 }}>Life Coach · Hypnotherapist · Digital Marketing · Zoey Zest</div>
+        <h1 style={{ fontSize: 52, fontWeight: 700, color: theme.primary, lineHeight: 1.15, margin: "0 0 24px", letterSpacing: "-1.5px" }}>Life is supposed to be <span className="tm-fun" style={{ fontFamily: "'Caveat', cursive", fontSize: 68, color: theme.accent, fontWeight: 700, display: "inline-block", transform: "rotate(-2deg)", position: "relative" }}>fun<span style={{ position: "absolute", bottom: -4, left: 0, right: 0, height: 6, background: `${theme.accent}25`, borderRadius: 3 }} /></span>.<br/>Building your business should be too.</h1>
+        <p className="tm-hero-sub" style={{ fontSize: 19, color: theme.textLight, lineHeight: 1.7, margin: "0 auto 20px", maxWidth: 640 }}>Hey, I'm Tina Maria. I help women in their 40s, 50s, and 60s start the online businesses they've been dreaming about — with the mindset, strategy, and tech support to actually make it happen.</p>
+        <p className="tm-hero-sub2" style={{ fontSize: 17, color: theme.text, lineHeight: 1.7, margin: "0 auto 36px", maxWidth: 580, fontWeight: 500 }}>No overwhelm. No jargon. Just real guidance from someone who gets it.</p>
+        <div className="tm-hero-btns" style={{ display: "flex", gap: 14, justifyContent: "center", flexWrap: "wrap" }}>
           <a href="/book" style={{ padding: "16px 36px", borderRadius: 50, border: "none", background: theme.primary, color: "white", fontSize: 16, fontWeight: 600, cursor: "pointer", transition: "all 0.3s", textDecoration: "none", display: "inline-block" }} onMouseEnter={e => { e.target.style.transform = "translateY(-2px)"; e.target.style.boxShadow = "0 8px 24px rgba(0,0,0,0.15)"; }} onMouseLeave={e => { e.target.style.transform = "translateY(0)"; e.target.style.boxShadow = "none"; }}>Book a Free Discovery Call</a>
           <a href="#about" style={{ padding: "16px 36px", borderRadius: 50, border: `2px solid ${theme.border}`, background: "white", color: theme.text, fontSize: 16, fontWeight: 600, cursor: "pointer", textDecoration: "none", display: "inline-block", transition: "all 0.2s" }} onMouseEnter={e => e.target.style.borderColor = theme.accent} onMouseLeave={e => e.target.style.borderColor = theme.border}>Get to Know Me</a>
         </div>
@@ -713,11 +726,11 @@ function WebsiteView({ onOpenAdmin }) {
 
   // ---- "I GET IT" SECTION ----
   const EmpathySection = () => (
-    <section style={{ background: "white", padding: "80px 40px" }}>
+    <section className="tm-section" style={{ background: "white", padding: "80px 40px" }}>
       <div style={{ maxWidth: 900, margin: "0 auto" }}>
-        <h2 style={{ fontSize: 38, fontWeight: 700, color: theme.primary, textAlign: "center", margin: "0 0 20px", letterSpacing: "-0.5px" }}>Sound like you?</h2>
+        <h2 className="tm-section-title" style={{ fontSize: 38, fontWeight: 700, color: theme.primary, textAlign: "center", margin: "0 0 20px", letterSpacing: "-0.5px" }}>Sound like you?</h2>
         <p style={{ fontSize: 17, color: theme.textLight, textAlign: "center", margin: "0 auto 48px", maxWidth: 600, lineHeight: 1.7 }}>If any of these hit home, you're in exactly the right place.</p>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 20 }}>
+        <div className="tm-grid-2" style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 20 }}>
           {[
             { emoji: "🤔", text: "You've got a business idea (or twelve) but have no clue where to start" },
             { emoji: "😤", text: "Technology makes you want to throw your laptop out the window" },
@@ -726,7 +739,7 @@ function WebsiteView({ onOpenAdmin }) {
             { emoji: "🙋‍♀️", text: "You feel like you missed the boat on this whole online thing" },
             { emoji: "💪", text: "Deep down you KNOW you're meant for more" },
           ].map((item, i) => (
-            <div key={i} style={{ display: "flex", alignItems: "center", gap: 16, padding: "20px 24px", borderRadius: 14, background: i === 5 ? theme.accentLight : theme.bg, border: `1px solid ${i === 5 ? theme.accent + "40" : theme.border}`, transition: "all 0.2s" }} onMouseEnter={e => e.currentTarget.style.transform = "translateX(4px)"} onMouseLeave={e => e.currentTarget.style.transform = "translateX(0)"}>
+            <div key={i} className="tm-empathy-card" style={{ display: "flex", alignItems: "center", gap: 16, padding: "20px 24px", borderRadius: 14, background: i === 5 ? theme.accentLight : theme.bg, border: `1px solid ${i === 5 ? theme.accent + "40" : theme.border}`, transition: "all 0.2s" }} onMouseEnter={e => e.currentTarget.style.transform = "translateX(4px)"} onMouseLeave={e => e.currentTarget.style.transform = "translateX(0)"}>
               <span style={{ fontSize: 28, flexShrink: 0 }}>{item.emoji}</span>
               <span style={{ fontSize: 16, color: theme.text, fontWeight: i === 5 ? 600 : 400, lineHeight: 1.5 }}>{item.text}</span>
             </div>
@@ -739,10 +752,10 @@ function WebsiteView({ onOpenAdmin }) {
 
   // ---- ABOUT ----
   const AboutSection = () => (
-    <section id="about" style={{ background: theme.accentLight, padding: "80px 40px" }}>
-      <div style={{ maxWidth: 1000, margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 60, alignItems: "center" }}>
+    <section id="about" className="tm-section" style={{ background: theme.accentLight, padding: "80px 40px" }}>
+      <div className="tm-about-grid" style={{ maxWidth: 1000, margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 60, alignItems: "center" }}>
         <div>
-          <div style={{ width: 100, height: 100, borderRadius: 50, background: `linear-gradient(135deg, ${theme.accent}, ${theme.warm})`, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 28 }}>
+          <div className="tm-about-avatar" style={{ width: 100, height: 100, borderRadius: 50, background: `linear-gradient(135deg, ${theme.accent}, ${theme.warm})`, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 28 }}>
             <span style={{ fontSize: 44 }}>👋</span>
           </div>
           <h2 style={{ fontSize: 38, fontWeight: 700, color: theme.primary, margin: "0 0 8px", letterSpacing: "-0.5px" }}>Hey, I'm Tina Maria.</h2>
@@ -761,13 +774,13 @@ function WebsiteView({ onOpenAdmin }) {
 
   // ---- SERVICES ----
   const ServicesSection = () => (
-    <section id="services" style={{ background: "white", padding: "80px 40px" }}>
+    <section id="services" className="tm-section" style={{ background: "white", padding: "80px 40px" }}>
       <div style={{ maxWidth: 1100, margin: "0 auto" }}>
         <div style={{ textAlign: "center", marginBottom: 56 }}>
-          <h2 style={{ fontSize: 38, fontWeight: 700, color: theme.primary, margin: "0 0 16px", letterSpacing: "-0.5px" }}>Here's How I Can Help</h2>
+          <h2 className="tm-section-title" style={{ fontSize: 38, fontWeight: 700, color: theme.primary, margin: "0 0 16px", letterSpacing: "-0.5px" }}>Here's How I Can Help</h2>
           <p style={{ fontSize: 17, color: theme.textLight, margin: 0, maxWidth: 560, marginLeft: "auto", marginRight: "auto", lineHeight: 1.6 }}>Whether you need mindset work, business guidance, tech help, or all three — I've got you covered.</p>
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 24 }}>
+        <div className="tm-grid-2" style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 24 }}>
           {[
             { emoji: "🌟", title: "Life Coaching", subtitle: "Clear the blocks. Find your fire.", desc: "Feeling stuck? Lost? Like there's got to be MORE? One-on-one coaching to help you get clear on what you actually want and start going after it. We'll work on your confidence, your goals, and that little voice that keeps saying 'you can't.'", price: "From $150/session", color: theme.accent },
             { emoji: "🧠", title: "Hypnotherapy", subtitle: "Rewire your brain for success.", desc: "This is where the deep transformation happens. We'll work with your subconscious mind to release the beliefs that have been quietly running the show — the money blocks, the self-doubt, the 'I'm not enough' stories. Life-changing stuff.", price: "From $200/session", color: "#8B7EC7" },
@@ -794,7 +807,7 @@ function WebsiteView({ onOpenAdmin }) {
           })}
         </div>
         {/* VIP callout */}
-        <div style={{ marginTop: 28, background: `linear-gradient(135deg, ${theme.primary}, #333)`, borderRadius: 16, padding: "32px 36px", color: "white", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <div className="tm-vip" style={{ marginTop: 28, background: `linear-gradient(135deg, ${theme.primary}, #333)`, borderRadius: 16, padding: "32px 36px", color: "white", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <div>
             <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
               <span style={{ fontSize: 28 }}>⚡</span>
@@ -813,8 +826,8 @@ function WebsiteView({ onOpenAdmin }) {
 
   // ---- SWC COURSE BANNER ----
   const CourseBanner = () => (
-    <section id="course" style={{ background: "white", padding: "60px 40px" }}>
-      <div style={{ maxWidth: 1000, margin: "0 auto", background: `linear-gradient(135deg, #1a1a2e, #16213e, #0f3460)`, borderRadius: 20, padding: "44px 48px", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 40, position: "relative", overflow: "hidden" }}>
+    <section id="course" className="tm-section" style={{ background: "white", padding: "60px 40px" }}>
+      <div className="tm-course" style={{ maxWidth: 1000, margin: "0 auto", background: `linear-gradient(135deg, #1a1a2e, #16213e, #0f3460)`, borderRadius: 20, padding: "44px 48px", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 40, position: "relative", overflow: "hidden" }}>
         <div style={{ position: "absolute", top: -40, right: -40, width: 200, height: 200, borderRadius: "50%", background: "rgba(123,158,137,0.12)" }} />
         <div style={{ position: "absolute", bottom: -30, left: -30, width: 140, height: 140, borderRadius: "50%", background: "rgba(196,168,130,0.1)" }} />
         <div style={{ position: "relative", zIndex: 1, flex: 1 }}>
@@ -832,7 +845,7 @@ function WebsiteView({ onOpenAdmin }) {
             <span style={{ fontSize: 13, color: "rgba(255,255,255,0.5)" }}>at beacons.ai/tinamariatok</span>
           </div>
         </div>
-        <div style={{ position: "relative", zIndex: 1, textAlign: "center", flexShrink: 0 }}>
+        <div className="tm-course-icon" style={{ position: "relative", zIndex: 1, textAlign: "center", flexShrink: 0 }}>
           <div style={{ width: 120, height: 120, borderRadius: "50%", background: "rgba(255,255,255,0.08)", display: "flex", alignItems: "center", justifyContent: "center", border: "2px solid rgba(255,255,255,0.15)" }}>
             <span style={{ fontSize: 52 }}>📱</span>
           </div>
@@ -848,7 +861,7 @@ function WebsiteView({ onOpenAdmin }) {
 
   // ---- FREE CALL BANNER ----
   const DiscoveryBanner = () => (
-    <section style={{ background: theme.warmLight, padding: "56px 40px", textAlign: "center" }}>
+    <section className="tm-section tm-discovery" style={{ background: theme.warmLight, padding: "56px 40px", textAlign: "center" }}>
       <div style={{ maxWidth: 650, margin: "0 auto" }}>
         <span style={{ fontSize: 32 }}>✨</span>
         <h3 style={{ fontSize: 26, fontWeight: 700, color: theme.primary, margin: "12px 0 12px" }}>Not sure where to start? That's okay.</h3>
@@ -860,10 +873,10 @@ function WebsiteView({ onOpenAdmin }) {
 
   // ---- WORK / PORTFOLIO ----
   const WorkSection = () => (
-    <section id="work" style={{ background: theme.accentLight, padding: "80px 40px" }}>
+    <section id="work" className="tm-section" style={{ background: theme.accentLight, padding: "80px 40px" }}>
       <div style={{ maxWidth: 1000, margin: "0 auto" }}>
         <div style={{ textAlign: "center", marginBottom: 48 }}>
-          <h2 style={{ fontSize: 38, fontWeight: 700, color: theme.primary, margin: "0 0 12px", letterSpacing: "-0.5px" }}>Things I've Built</h2>
+          <h2 className="tm-section-title" style={{ fontSize: 38, fontWeight: 700, color: theme.primary, margin: "0 0 12px", letterSpacing: "-0.5px" }}>Things I've Built</h2>
           <p style={{ fontSize: 17, color: theme.textLight, margin: 0, lineHeight: 1.6 }}>I don't just talk about building things — I actually do it. Here's the proof.</p>
         </div>
         <div style={{ display: "grid", gap: 24 }}>
@@ -876,7 +889,7 @@ function WebsiteView({ onOpenAdmin }) {
                 <span style={{ fontSize: 32 }}>{project.emoji}</span>
                 <h3 style={{ fontSize: 22, fontWeight: 700, color: theme.primary, margin: 0 }}>{project.title}</h3>
               </div>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 28, marginBottom: 24 }}>
+              <div className="tm-work-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 28, marginBottom: 24 }}>
                 <div>
                   <div style={{ fontSize: 12, fontWeight: 700, color: theme.accent, textTransform: "uppercase", letterSpacing: "1px", marginBottom: 8 }}>The Vision</div>
                   <p style={{ fontSize: 15, color: theme.text, lineHeight: 1.7, margin: 0 }}>{project.vision}</p>
@@ -897,16 +910,16 @@ function WebsiteView({ onOpenAdmin }) {
 
   // ---- BLOG ----
   const BlogSection = () => (
-    <section id="blog" style={{ background: "white", padding: "80px 40px" }}>
+    <section id="blog" className="tm-section" style={{ background: "white", padding: "80px 40px" }}>
       <div style={{ maxWidth: 1100, margin: "0 auto" }}>
         <div style={{ textAlign: "center", marginBottom: 48 }}>
-          <h2 style={{ fontSize: 38, fontWeight: 700, color: theme.primary, margin: "0 0 12px", letterSpacing: "-0.5px" }}>The Blog</h2>
+          <h2 className="tm-section-title" style={{ fontSize: 38, fontWeight: 700, color: theme.primary, margin: "0 0 12px", letterSpacing: "-0.5px" }}>The Blog</h2>
           <p style={{ fontSize: 17, color: theme.textLight, margin: 0, lineHeight: 1.6 }}>Real talk about money, mindset, manifestation, and building your thing online.</p>
         </div>
         {activePost ? (
           <div>
             <button onClick={() => setActivePost(null)} style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 0", background: "none", border: "none", color: theme.accent, fontSize: 14, fontWeight: 600, cursor: "pointer", marginBottom: 24 }}><ArrowLeft size={16} /> Back to all posts</button>
-            <article style={{ maxWidth: 720, margin: "0 auto" }}>
+            <article className="tm-blog-article" style={{ maxWidth: 720, margin: "0 auto" }}>
               <span style={{ display: "inline-block", background: activePost.tagColor + "18", color: activePost.tagColor, padding: "4px 14px", borderRadius: 50, fontSize: 12, fontWeight: 700, letterSpacing: "0.5px", marginBottom: 16 }}>{activePost.tag}</span>
               <h1 style={{ fontSize: 36, fontWeight: 700, color: theme.primary, margin: "0 0 12px", lineHeight: 1.25, letterSpacing: "-0.5px" }}>{activePost.title}</h1>
               <p style={{ fontSize: 14, color: theme.textLight, margin: "0 0 36px" }}>{activePost.date} · {activePost.readTime}</p>
@@ -919,7 +932,7 @@ function WebsiteView({ onOpenAdmin }) {
             </article>
           </div>
         ) : (
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 24 }}>
+          <div className="tm-grid-3" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 24 }}>
             {blogPosts.map(post => (
               <div key={post.id} onClick={() => setActivePost(post)} style={{ background: theme.card, border: `1px solid ${hoveredCard === `post-${post.id}` ? theme.accent + "50" : theme.border}`, borderRadius: 16, padding: "28px 24px", cursor: "pointer", transition: "all 0.3s", transform: hoveredCard === `post-${post.id}` ? "translateY(-4px)" : "none", boxShadow: hoveredCard === `post-${post.id}` ? "0 8px 24px rgba(0,0,0,0.06)" : "none" }} onMouseEnter={() => setHoveredCard(`post-${post.id}`)} onMouseLeave={() => setHoveredCard(null)}>
                 <span style={{ display: "inline-block", background: post.tagColor + "18", color: post.tagColor, padding: "3px 12px", borderRadius: 50, fontSize: 11, fontWeight: 700, letterSpacing: "0.5px", marginBottom: 14 }}>{post.tag}</span>
@@ -941,14 +954,14 @@ function WebsiteView({ onOpenAdmin }) {
   const CreativeSection = () => {
     const linkBtnStyle = (color) => ({ display: "inline-flex", alignItems: "center", gap: 6, padding: "7px 14px", borderRadius: 50, border: `1px solid ${color}30`, background: color + "10", color: color, fontSize: 12, fontWeight: 600, textDecoration: "none", cursor: "pointer", transition: "all 0.2s" });
     return (
-    <section id="creative" style={{ background: theme.bg, padding: "80px 40px" }}>
+    <section id="creative" className="tm-section" style={{ background: theme.bg, padding: "80px 40px" }}>
       <div style={{ maxWidth: 1100, margin: "0 auto" }}>
         <div style={{ textAlign: "center", marginBottom: 48 }}>
-          <h2 style={{ fontSize: 38, fontWeight: 700, color: theme.primary, margin: "0 0 12px", letterSpacing: "-0.5px" }}>The Fun Stuff</h2>
+          <h2 className="tm-section-title" style={{ fontSize: 38, fontWeight: 700, color: theme.primary, margin: "0 0 12px", letterSpacing: "-0.5px" }}>The Fun Stuff</h2>
           <p style={{ fontSize: 17, color: theme.textLight, margin: 0, lineHeight: 1.6 }}>Because life isn't just about business (but these are pretty great for business too).</p>
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 24, marginBottom: 24 }}>
+        <div className="tm-grid-2" style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 24, marginBottom: 24 }}>
           {/* ZOEY ZEST */}
           <div style={{ background: "white", border: `1px solid ${hoveredCard === "zoey" ? theme.accent + "50" : theme.border}`, borderRadius: 16, padding: "32px 28px", transition: "all 0.3s", transform: hoveredCard === "zoey" ? "translateY(-4px)" : "none", boxShadow: hoveredCard === "zoey" ? `0 8px 24px ${theme.accent}15` : "none" }} onMouseEnter={() => setHoveredCard("zoey")} onMouseLeave={() => setHoveredCard(null)}>
             <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 16 }}>
@@ -991,7 +1004,7 @@ function WebsiteView({ onOpenAdmin }) {
           </div>
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 24 }}>
+        <div className="tm-grid-2" style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 24 }}>
           {/* 1000 NO'S BOOK */}
           <div style={{ background: "white", border: `1px solid ${hoveredCard === "book" ? "#8B7EC7" + "50" : theme.border}`, borderRadius: 16, padding: "32px 28px", transition: "all 0.3s", transform: hoveredCard === "book" ? "translateY(-4px)" : "none", boxShadow: hoveredCard === "book" ? "0 8px 24px rgba(139,126,199,0.12)" : "none" }} onMouseEnter={() => setHoveredCard("book")} onMouseLeave={() => setHoveredCard(null)}>
             <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 16 }}>
@@ -1029,7 +1042,7 @@ function WebsiteView({ onOpenAdmin }) {
 
   // ---- FINAL CTA ----
   const FinalCTASection = () => (
-    <section id="contact" style={{ background: `linear-gradient(135deg, ${theme.primary}, #2a2a2a)`, color: "white", padding: "80px 40px", textAlign: "center" }}>
+    <section id="contact" className="tm-section tm-final-cta" style={{ background: `linear-gradient(135deg, ${theme.primary}, #2a2a2a)`, color: "white", padding: "80px 40px", textAlign: "center" }}>
       <div style={{ maxWidth: 660, margin: "0 auto" }}>
         <span style={{ fontSize: 40, display: "block", marginBottom: 20 }}>💛</span>
         <h2 style={{ fontSize: 38, fontWeight: 700, margin: "0 0 20px", letterSpacing: "-0.5px" }}>Your next chapter starts with one conversation.</h2>
@@ -1043,7 +1056,7 @@ function WebsiteView({ onOpenAdmin }) {
 
   // ---- FOOTER ----
   const Footer = () => (
-    <footer style={{ background: theme.bg, borderTop: `1px solid ${theme.border}`, padding: "32px 40px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+    <footer className="tm-footer" style={{ background: theme.bg, borderTop: `1px solid ${theme.border}`, padding: "32px 40px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
         <div style={{ width: 28, height: 28, borderRadius: 50, background: `linear-gradient(135deg, ${theme.accent}, ${theme.warm})`, display: "flex", alignItems: "center", justifyContent: "center" }}><Sparkles size={12} color="white" /></div>
         <span style={{ fontSize: 14, fontWeight: 600, color: theme.text }}>TinaMaria</span>
@@ -1098,7 +1111,7 @@ function DashboardView({ appointments, transactions, clients, selectedDate }) {
 
   return (
     <div>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 20, marginBottom: 28 }}>
+      <div className="tm-grid-4" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 20, marginBottom: 28 }}>
         {stats.map((s, i) => {
           const Icon = s.icon;
           return (
@@ -1116,7 +1129,7 @@ function DashboardView({ appointments, transactions, clients, selectedDate }) {
         })}
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
+      <div className="tm-grid-2" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
         {/* Revenue Chart */}
         <div style={{ background: theme.card, borderRadius: 16, padding: 24, border: `1px solid ${theme.border}` }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
@@ -1449,7 +1462,7 @@ function PaymentsView({ transactions }) {
 
   return (
     <div>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 20, marginBottom: 28 }}>
+      <div className="tm-grid-4" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 20, marginBottom: 28 }}>
         {[
           { label: "Total Revenue", value: formatCurrency(totalRevenue), icon: DollarSign, color: theme.success, bg: theme.successLight },
           { label: "Tips / Bonuses", value: formatCurrency(totalTips), icon: Heart, color: theme.accent, bg: theme.accentLight },
