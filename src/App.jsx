@@ -448,6 +448,7 @@ export default function TinaMariaApp() {
   const [showClientDetail, setShowClientDetail] = useState(null);
   const [selectedDate, setSelectedDate] = useState("2026-02-12");
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
 
@@ -494,7 +495,44 @@ export default function TinaMariaApp() {
 
   return (
     <div className="tm-admin-layout" style={{ display: "flex", height: "100vh", fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif", background: theme.bg, color: theme.text, overflow: "hidden" }}>
-      {/* SIDEBAR */}
+      {/* MOBILE NAV DROPDOWN — shown only on mobile */}
+      <div className="tm-mobile-admin-bar" style={{ display: "none" }}>
+        <div style={{ background: theme.sidebar, padding: "12px 16px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <div style={{ width: 32, height: 32, borderRadius: 8, background: `linear-gradient(135deg, ${theme.accent}, ${theme.accentMid})`, display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <Sparkles size={14} color="white" />
+            </div>
+            <span style={{ fontSize: 15, fontWeight: 700, color: "white" }}>Tina Maria</span>
+          </div>
+          <button onClick={() => setMobileNavOpen(!mobileNavOpen)} style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 14px", borderRadius: 8, border: "1px solid rgba(255,255,255,0.15)", background: "rgba(255,255,255,0.08)", color: "white", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
+            {(() => { const ActiveIcon = navItems.find(n => n.id === activeTab)?.icon || BarChart3; return <ActiveIcon size={16} />; })()}
+            {navItems.find(n => n.id === activeTab)?.label || "Dashboard"}
+            <ChevronDown size={14} style={{ transform: mobileNavOpen ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s" }} />
+          </button>
+        </div>
+        {mobileNavOpen && (
+          <div style={{ background: theme.sidebar, borderBottom: "2px solid rgba(255,255,255,0.08)", padding: "4px 12px 12px" }}>
+            {navItems.map((item) => {
+              const Icon = item.icon;
+              const active = activeTab === item.id;
+              return (
+                <button key={item.id} onClick={() => { setActiveTab(item.id); setMobileNavOpen(false); }} style={{ display: "flex", alignItems: "center", gap: 12, width: "100%", padding: "10px 14px", marginBottom: 2, borderRadius: 10, border: "none", cursor: "pointer", background: active ? "rgba(123,158,137,0.25)" : "transparent", color: active ? "white" : theme.sidebarText, transition: "all 0.2s", fontSize: 14, fontWeight: active ? 600 : 400 }}>
+                  <Icon size={18} />
+                  <span>{item.label}</span>
+                  {active && <Check size={14} style={{ marginLeft: "auto" }} />}
+                </button>
+              );
+            })}
+            <div style={{ height: 1, background: "rgba(255,255,255,0.08)", margin: "8px 4px" }} />
+            <button onClick={() => { setView("website"); setMobileNavOpen(false); }} style={{ display: "flex", alignItems: "center", gap: 12, width: "100%", padding: "10px 14px", borderRadius: 10, border: "none", cursor: "pointer", background: "transparent", color: theme.sidebarText, fontSize: 14 }}>
+              <Globe size={18} />
+              <span>View Website</span>
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* DESKTOP SIDEBAR — hidden on mobile */}
       <aside className="tm-sidebar" style={{ width: sidebarCollapsed ? 72 : 240, background: theme.sidebar, display: "flex", flexDirection: "column", transition: "width 0.3s ease", flexShrink: 0, overflow: "hidden" }}>
         <div className="tm-sidebar-logo" style={{ padding: sidebarCollapsed ? "24px 12px" : "24px 20px", borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }} onClick={() => setSidebarCollapsed(!sidebarCollapsed)}>
