@@ -115,11 +115,20 @@ const getDayName = (str) => { const d = new Date(str + "T00:00:00"); return d.to
 // ---------- API HELPERS ----------
 const API_BASE = "/.netlify/functions";
 
-async function createCheckoutSession(service, customerEmail, customerName) {
+async function createCheckoutSession(service, customerEmail, customerName, customerPhone) {
   const res = await fetch(`${API_BASE}/create-checkout-session`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ serviceName: service.name, price: service.price, duration: service.duration, customerEmail, customerName }),
+    body: JSON.stringify({ serviceName: service.name, price: service.price, duration: service.duration, customerEmail, customerName, customerPhone }),
+  });
+  return res.json();
+}
+
+async function sendSMS(to, message) {
+  const res = await fetch(`${API_BASE}/send-sms`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ to, message }),
   });
   return res.json();
 }
@@ -147,28 +156,75 @@ function BookingView() {
   const [selectedService, setSelectedService] = useState(null);
   const [customerName, setCustomerName] = useState("");
   const [customerEmail, setCustomerEmail] = useState("");
+  const [customerPhone, setCustomerPhone] = useState("");
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState(null); // "success" | "canceled" | null
   const [hoveredId, setHoveredId] = useState(null);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    if (params.get("success") === "true") setStatus("success");
-    if (params.get("canceled") === "true") setStatus("canceled");
+    if (params.get("canceled") === "true") { setStatus("canceled"); return; }
+    if (params.get("success") === "true") {
+      setStatus("success");
+      // Send confirmation email + SMS
+      const savedBooking = sessionStorage.getItem("tm_booking");
+      if (savedBooking) {
+        try {
+          const booking = JSON.parse(savedBooking);
+          fetch(`${API_BASE}/booking-confirmation`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              customerName: booking.customerName,
+              customerEmail: booking.customerEmail,
+              customerPhone: booking.customerPhone,
+              serviceName: booking.serviceName,
+              price: booking.price,
+              duration: booking.duration,
+              sessionId: params.get("session_id") || "",
+            }),
+          }).catch(err => console.error("Confirmation send error:", err));
+          sessionStorage.removeItem("tm_booking");
+        } catch (e) { console.error("Parse booking error:", e); }
+      }
+    }
   }, []);
 
   const bookableServices = SERVICES.filter(s => s.price > 0 || s.id === 5); // Include Discovery Call
 
   const handleCheckout = async () => {
     if (!selectedService) return;
-    if (!customerName.trim() || !customerEmail.trim()) {
-      alert("Please enter your name and email.");
+    if (!customerName.trim() || !customerEmail.trim() || !customerPhone.trim()) {
+      alert("Please enter your name, email, and phone number.");
       return;
     }
     setLoading(true);
+    // Save booking info so we can send confirmation after Stripe redirect
+    sessionStorage.setItem("tm_booking", JSON.stringify({
+      customerName: customerName.trim(),
+      customerEmail: customerEmail.trim(),
+      customerPhone: customerPhone.trim(),
+      serviceName: selectedService.name,
+      price: selectedService.price,
+      duration: selectedService.duration,
+    }));
     try {
-      const data = await createCheckoutSession(selectedService, customerEmail, customerName);
+      const data = await createCheckoutSession(selectedService, customerEmail, customerName, customerPhone);
       if (data.free) {
+        // For free calls, send confirmation directly
+        fetch(`${API_BASE}/booking-confirmation`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            customerName: customerName.trim(),
+            customerEmail: customerEmail.trim(),
+            customerPhone: customerPhone.trim(),
+            serviceName: selectedService.name,
+            price: 0,
+            duration: selectedService.duration,
+            sessionId: "",
+          }),
+        }).catch(err => console.error("Confirmation error:", err));
         setStatus("success");
         setLoading(false);
         return;
@@ -279,7 +335,7 @@ function BookingView() {
               Your Information
             </h2>
             <div style={{ background: "white", borderRadius: 14, border: `1px solid ${theme.border}`, padding: 28 }}>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 24 }}>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 }}>
                 <div>
                   <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: theme.text, marginBottom: 6 }}>Your Name</label>
                   <input value={customerName} onChange={e => setCustomerName(e.target.value)} placeholder="Jane Smith" style={{ width: "100%", padding: "12px 14px", borderRadius: 10, border: `1px solid ${theme.border}`, fontSize: 15, outline: "none", boxSizing: "border-box" }} />
@@ -288,6 +344,11 @@ function BookingView() {
                   <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: theme.text, marginBottom: 6 }}>Email Address</label>
                   <input value={customerEmail} onChange={e => setCustomerEmail(e.target.value)} type="email" placeholder="jane@email.com" style={{ width: "100%", padding: "12px 14px", borderRadius: 10, border: `1px solid ${theme.border}`, fontSize: 15, outline: "none", boxSizing: "border-box" }} />
                 </div>
+              </div>
+              <div style={{ marginBottom: 24 }}>
+                <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: theme.text, marginBottom: 6 }}>Phone Number</label>
+                <input value={customerPhone} onChange={e => setCustomerPhone(e.target.value)} type="tel" placeholder="(555) 123-4567" style={{ width: "100%", padding: "12px 14px", borderRadius: 10, border: `1px solid ${theme.border}`, fontSize: 15, outline: "none", boxSizing: "border-box" }} />
+                <span style={{ fontSize: 12, color: theme.textMuted, marginTop: 4, display: "block" }}>We'll send you a text confirmation and session reminder</span>
               </div>
 
               {/* Order summary */}
@@ -313,6 +374,63 @@ function BookingView() {
   );
 }
 
+// ---------- ADMIN PASSWORD GATE ----------
+function AdminLoginGate({ onAuthenticated }) {
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(false);
+    try {
+      const res = await fetch(`${API_BASE}/admin-auth`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password }),
+      });
+      const data = await res.json();
+      if (data.authenticated) {
+        sessionStorage.setItem("tm_admin", "true");
+        onAuthenticated();
+      } else {
+        setError(true);
+      }
+    } catch {
+      setError(true);
+    }
+    setLoading(false);
+  };
+
+  return (
+    <div style={{ fontFamily: "'Inter', sans-serif", minHeight: "100vh", background: `linear-gradient(180deg, ${theme.bg} 0%, white 100%)`, display: "flex", alignItems: "center", justifyContent: "center", padding: 40 }}>
+      <div style={{ maxWidth: 400, width: "100%", textAlign: "center" }}>
+        <div style={{ width: 64, height: 64, borderRadius: "50%", background: `linear-gradient(135deg, ${theme.accent}, ${theme.warm})`, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 24px" }}>
+          <ShieldCheck size={28} color="white" />
+        </div>
+        <h1 style={{ fontSize: 24, fontWeight: 700, color: theme.primary, margin: "0 0 8px" }}>Admin Access</h1>
+        <p style={{ fontSize: 15, color: theme.textLight, margin: "0 0 32px" }}>Enter your password to access the dashboard.</p>
+        <form onSubmit={handleSubmit}>
+          <input
+            type="password"
+            value={password}
+            onChange={e => { setPassword(e.target.value); setError(false); }}
+            placeholder="Enter password"
+            autoFocus
+            style={{ width: "100%", padding: "14px 18px", borderRadius: 12, border: `2px solid ${error ? theme.danger : theme.border}`, fontSize: 16, outline: "none", boxSizing: "border-box", marginBottom: 16, textAlign: "center", letterSpacing: 2 }}
+          />
+          {error && <p style={{ fontSize: 13, color: theme.danger, margin: "0 0 12px" }}>Incorrect password. Try again.</p>}
+          <button type="submit" disabled={loading || !password} style={{ width: "100%", padding: "14px", borderRadius: 50, border: "none", background: loading ? theme.textMuted : theme.primary, color: "white", fontSize: 15, fontWeight: 600, cursor: loading ? "not-allowed" : "pointer" }}>
+            {loading ? "Checking..." : "Enter Dashboard"}
+          </button>
+        </form>
+        <a href="/" style={{ display: "inline-block", marginTop: 20, fontSize: 13, color: theme.textLight, textDecoration: "none" }}>Back to website</a>
+      </div>
+    </div>
+  );
+}
+
 export default function TinaMariaApp() {
   // URL-based routing: /book shows BookingView directly
   const [view, setView] = useState(() => {
@@ -320,6 +438,7 @@ export default function TinaMariaApp() {
     if (path === "/book" || path === "/book/") return "booking";
     return "website";
   });
+  const [adminAuthenticated, setAdminAuthenticated] = useState(() => sessionStorage.getItem("tm_admin") === "true");
   const [activeTab, setActiveTab] = useState("dashboard");
   const [appointments] = useState(generateAppointments);
   const [clients, setClients] = useState(CLIENTS_DATA);
@@ -349,6 +468,11 @@ export default function TinaMariaApp() {
 
   if (view === "website") {
     return <WebsiteView onOpenAdmin={() => setView("admin")} />;
+  }
+
+  // Admin password gate
+  if (view === "admin" && !adminAuthenticated) {
+    return <AdminLoginGate onAuthenticated={() => setAdminAuthenticated(true)} />;
   }
 
   const notifications = [
