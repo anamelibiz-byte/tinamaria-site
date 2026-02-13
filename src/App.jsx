@@ -1273,13 +1273,20 @@ function CalendarView({ appointments, selectedDate, setSelectedDate, onNewAppt }
   const [viewMode, setViewMode] = useState("day");
   const [calStatus, setCalStatus] = useState(null); // null | "checking" | {connected:true,...} | {error:...}
   const [syncing, setSyncing] = useState(false);
+  const [gcalEvents, setGcalEvents] = useState([]);
   const dayAppts = appointments.filter(a => a.date === selectedDate);
   const hours = Array.from({ length: 12 }, (_, i) => i + 8);
 
   // Check Google Calendar connection status on mount
   useEffect(() => {
     setCalStatus("checking");
-    calendarAction("status").then(data => setCalStatus(data)).catch(() => setCalStatus({ error: "Not connected" }));
+    calendarAction("status")
+      .then(data => {
+        if (data.connected) setCalStatus(data);
+        else if (data.error && data.error.includes("Not connected")) setCalStatus({ error: "not_configured" });
+        else setCalStatus({ error: "not_configured" });
+      })
+      .catch(() => setCalStatus({ error: "not_configured" }));
   }, []);
 
   const handleSync = async () => {
@@ -1287,13 +1294,26 @@ function CalendarView({ appointments, selectedDate, setSelectedDate, onNewAppt }
     try {
       const data = await calendarAction("list");
       if (data.events) {
+        setGcalEvents(data.events);
         alert(`Synced! Found ${data.events.length} upcoming events on Google Calendar.`);
+      } else if (data.error) {
+        alert("Sync error: " + data.error);
       }
-    } catch (err) { console.error(err); }
+    } catch (err) { console.error(err); alert("Failed to sync. Check your connection."); }
     setSyncing(false);
   };
 
   const handleConnect = async () => {
+    // First check if already connected (refresh token exists server-side)
+    try {
+      const statusCheck = await calendarAction("status");
+      if (statusCheck.connected) {
+        setCalStatus(statusCheck);
+        alert("Google Calendar is already connected! Click 'Sync Now' to pull your events.");
+        return;
+      }
+    } catch (e) { /* continue to auth */ }
+    // Only open auth if truly not connected
     try {
       const data = await calendarAction("auth");
       if (data.authUrl) window.open(data.authUrl, "_blank");
