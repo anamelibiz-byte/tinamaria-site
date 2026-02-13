@@ -691,13 +691,17 @@ function WebsiteView({ onOpenAdmin }) {
         <a className="tm-book-btn" href="/book" style={{ padding: "10px 24px", borderRadius: 50, border: "none", background: theme.primary, color: "white", fontSize: 14, fontWeight: 600, cursor: "pointer", transition: "all 0.2s", textDecoration: "none" }} onMouseEnter={e => { e.target.style.background = "#333"; e.target.style.transform = "translateY(-1px)"; }} onMouseLeave={e => { e.target.style.background = theme.primary; e.target.style.transform = "translateY(0)"; }}>Book Now</a>
       </div>
       {mobileMenu && (
-        <div className="tm-mobile-menu" style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(255,255,255,0.98)", zIndex: 2000, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 24 }}>
-          <button className="tm-mobile-menu-close" onClick={() => setMobileMenu(false)} style={{ position: "absolute", top: 16, right: 16, background: "none", border: "none", cursor: "pointer" }}><X size={28} color={theme.text} /></button>
-          {["About", "Services", "Course", "Work", "Blog", "Creative", "Contact"].map(item => (
-            <a key={item} href={`#${item.toLowerCase()}`} onClick={() => setMobileMenu(false)} style={{ fontSize: 20, fontWeight: 600, color: theme.primary, textDecoration: "none" }}>{item}</a>
-          ))}
-          <a href="/book" onClick={() => setMobileMenu(false)} style={{ padding: "14px 36px", borderRadius: 50, background: theme.primary, color: "white", fontSize: 16, fontWeight: 600, textDecoration: "none", marginTop: 12 }}>Book Now</a>
-          <button onClick={() => { onOpenAdmin(); setMobileMenu(false); }} style={{ padding: "10px 24px", borderRadius: 8, border: `1px solid ${theme.border}`, background: "transparent", color: theme.textLight, fontSize: 14, cursor: "pointer" }}>Admin</button>
+        <div className="tm-mobile-menu" style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "white", zIndex: 2000, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 0, overflow: "auto" }}>
+          <button onClick={() => setMobileMenu(false)} style={{ position: "absolute", top: 16, right: 16, background: "none", border: "none", cursor: "pointer", zIndex: 2001, padding: 8 }}><X size={28} color={theme.text} /></button>
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6, padding: "20px 0" }}>
+            {["About", "Services", "Course", "Work", "Blog", "Creative", "Contact"].map(item => (
+              <a key={item} href={`#${item.toLowerCase()}`} onClick={() => setMobileMenu(false)} style={{ fontSize: 18, fontWeight: 500, color: theme.text, textDecoration: "none", padding: "12px 40px", borderRadius: 10, width: "100%", textAlign: "center", transition: "background 0.2s" }}>{item}</a>
+            ))}
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 10, alignItems: "center", paddingTop: 16, borderTop: `1px solid ${theme.border}`, width: "80%" }}>
+            <a href="/book" onClick={() => setMobileMenu(false)} style={{ padding: "14px 40px", borderRadius: 50, background: theme.primary, color: "white", fontSize: 15, fontWeight: 600, textDecoration: "none", textAlign: "center", width: "100%" }}>Book Now</a>
+            <button onClick={() => { onOpenAdmin(); setMobileMenu(false); }} style={{ padding: "10px 24px", borderRadius: 8, border: `1px solid ${theme.border}`, background: "transparent", color: theme.textLight, fontSize: 13, cursor: "pointer" }}>Admin Dashboard</button>
+          </div>
         </div>
       )}
     </nav>
@@ -881,8 +885,8 @@ function WebsiteView({ onOpenAdmin }) {
         </div>
         <div style={{ display: "grid", gap: 24 }}>
           {[
-            { emoji: "🚀", title: "PlanMyPartyPal.com", vision: "Nobody should spend more time stressing about a party than enjoying it. I built an app that handles the logistics so you can focus on the fun.", build: "A full web application that manages guest lists, timelines, budgets, and vendor coordination. Built with AI tools, designed for real people.", cta: "Visit PlanMyPartyPal.com", result: null },
-            { emoji: "💅", title: "Luxury Esthetician Booking System", vision: "A talented esthetician was drowning in scheduling DMs and missed appointments. She needed a digital front desk that matched her brand.", build: "A gorgeous, mobile-first booking site with automated scheduling, deposits, intake forms, and follow-up emails.", cta: "Let's Build Yours", result: "40% less admin time. More bookings. Happier clients. And she finally took a vacation." },
+            { emoji: "🚀", title: "PlanMyPartyPal.com", vision: "Nobody should spend more time stressing about a party than enjoying it. I built an app that handles the logistics so you can focus on the fun.", build: "A full web application that manages guest lists, timelines, budgets, and vendor coordination. Built with AI tools, designed for real people.", cta: "Visit PlanMyPartyPal.com", link: "https://www.planmypartypal.com", result: null },
+            { emoji: "💅", title: "Luxury Esthetician Booking System", vision: "A talented esthetician was drowning in scheduling DMs and missed appointments. She needed a digital front desk that matched her brand.", build: "A gorgeous, mobile-first booking site with automated scheduling, deposits, intake forms, and follow-up emails.", cta: "Let's Build Yours", link: "/book", result: "40% less admin time. More bookings. Happier clients. And she finally took a vacation." },
           ].map(project => (
             <div key={project.title} style={{ background: "white", borderRadius: 16, padding: "36px 32px", border: `1px solid ${theme.border}`, transition: "all 0.3s" }} onMouseEnter={e => e.currentTarget.style.boxShadow = "0 8px 28px rgba(0,0,0,0.06)"} onMouseLeave={e => e.currentTarget.style.boxShadow = "none"}>
               <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 20 }}>
@@ -900,7 +904,7 @@ function WebsiteView({ onOpenAdmin }) {
                 </div>
               </div>
               {project.result && <p style={{ fontSize: 15, color: theme.accent, fontWeight: 600, margin: "0 0 24px", background: theme.accentLight, padding: "12px 16px", borderRadius: 10, lineHeight: 1.5 }}>📊 {project.result}</p>}
-              <button style={{ display: "flex", alignItems: "center", gap: 8, padding: "12px 24px", borderRadius: 50, border: "none", background: theme.primary, color: "white", fontSize: 14, fontWeight: 600, cursor: "pointer" }}>{project.cta} <ArrowRight size={16} /></button>
+              <a href={project.link} target={project.link.startsWith("http") ? "_blank" : undefined} rel={project.link.startsWith("http") ? "noopener noreferrer" : undefined} style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "12px 24px", borderRadius: 50, border: "none", background: theme.primary, color: "white", fontSize: 14, fontWeight: 600, cursor: "pointer", textDecoration: "none" }}>{project.cta} <ArrowRight size={16} /></a>
             </div>
           ))}
         </div>
@@ -998,9 +1002,20 @@ function WebsiteView({ onOpenAdmin }) {
               </div>
             </div>
             <p style={{ fontSize: 15, color: theme.textLight, lineHeight: 1.7, margin: "0 0 20px" }}>Remember when getting mail was exciting? This is that. A heartfelt monthly subscription bringing handwritten inspiration, affirmations, and little surprises straight to your mailbox. Because some things are better on paper.</p>
-            <a href="#join-snailmail" style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "12px 28px", borderRadius: 50, border: "none", background: theme.warm, color: "white", fontSize: 14, fontWeight: 600, cursor: "pointer", textDecoration: "none", transition: "all 0.2s" }} onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-1px)"; e.currentTarget.style.boxShadow = "0 4px 16px " + theme.warm + "40"; }} onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}>
+            <button onClick={async () => {
+              try {
+                const res = await fetch(`${API_BASE}/create-subscription`, {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ productName: "Snail Mail Club", priceAmount: 12 }),
+                });
+                const data = await res.json();
+                if (data.url) window.location.href = data.url;
+                else alert("Something went wrong. Please try again.");
+              } catch (err) { console.error(err); alert("Connection error. Please try again."); }
+            }} style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "12px 28px", borderRadius: 50, border: "none", background: theme.warm, color: "white", fontSize: 14, fontWeight: 600, cursor: "pointer", transition: "all 0.2s" }} onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-1px)"; e.currentTarget.style.boxShadow = "0 4px 16px " + theme.warm + "40"; }} onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}>
               <MailOpen size={16} /> Join the Club — $12/mo
-            </a>
+            </button>
           </div>
         </div>
 

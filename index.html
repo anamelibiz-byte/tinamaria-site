@@ -51,8 +51,9 @@
         .tm-hero .tm-hero-sub { font-size: 16px !important; }
         .tm-hero .tm-hero-sub2 { font-size: 15px !important; }
         .tm-hero .tm-hero-pill { font-size: 12px !important; padding: 6px 14px !important; }
-        .tm-hero .tm-hero-btns { flex-direction: column !important; align-items: stretch !important; }
-        .tm-hero .tm-hero-btns a { text-align: center !important; padding: 14px 24px !important; }
+        .tm-hero .tm-hero-btns { flex-direction: column !important; align-items: stretch !important; max-width: 320px !important; margin: 0 auto !important; }
+        .tm-hero .tm-hero-btns a { text-align: center !important; padding: 14px 24px !important; font-size: 15px !important; color: white !important; }
+        .tm-hero .tm-hero-btns a:last-child { color: #1D1D1D !important; }
 
         /* ALL SECTIONS — reduce padding */
         .tm-section { padding: 48px 16px !important; }
@@ -81,6 +82,9 @@
 
         /* WORK / PORTFOLIO */
         .tm-work-grid { grid-template-columns: 1fr !important; }
+
+        /* SERVICE CARD BUTTONS */
+        .tm-section a[href="/book"] { white-space: nowrap !important; }
 
         /* BOOKING VIEW */
         .tm-booking-nav { padding: 12px 16px !important; }
